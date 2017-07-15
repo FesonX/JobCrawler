@@ -1,12 +1,20 @@
 # JobCrawler
+
+## Intro
 Scrapy Project For Crawling Job Information on 51Job
 
-## Version1.0
+## About Scrapy
 
-### Instal Scrapy for your PC
+### Get docs from Scrapy(Chinese Ver. Avaiable)
+```
+http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/overview.html
+```
+### Install Scrapy for your PC
 ```
 http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 ```
+
+## Version1.0
 
 ### Run JobCrawler
 ```
