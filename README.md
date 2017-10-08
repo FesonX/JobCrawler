@@ -31,3 +31,14 @@ class JobSpider(Spider):
     ...
 
 ```
+
+
+## Version2.0
+#### Version Intro
+
+1. Add new feature: data sort out and data store
+   data store based on mysql
+   features bulid on Scrapy's Pipeline module
+2. New running program way: run `run.py`
+3. Check out article `http://www.jianshu.com/p/17c9241acc71`
+
