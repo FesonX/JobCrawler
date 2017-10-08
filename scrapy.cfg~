@@ -1,0 +1,5 @@
+[settings]
+default = JobCrawler.settings
+
+[deploy]
+project = jobCrawler
