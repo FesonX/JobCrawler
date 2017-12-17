@@ -14,6 +14,10 @@ http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/overview.html
 http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 ```
 
+## Simple data
+
+>`job.csv` include job data about `python` from `51job`
+
 ## Version1.0
 
 ### Run JobCrawler
