@@ -16,26 +16,16 @@ class JobSpider(Spider):
 
     def start_requests(self):
         keyword = raw_input('请输入职位关键词：')
-        while(1):
-            area = raw_input('请选择职位地区数字：1.全国， 2.东莞')
-            if(area == '1'):
-                url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&keyword=%s' \
+        url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=030800&keyword=%s' \
               '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (keyword)
-                break
-            if(area == '2'):
-                url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=030800&keyword=%s' \
-              '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (keyword)
-                break
-            else:
-                print("输入有误，请重新输入")
         yield Request(url, headers=self.headers)
 
     def parse(self, response):
+
         item = JobcrawlerItem()
         jobs = response.xpath('//*[@id="resultList"]/div[@class="el"]')
         for job in jobs:
             loader = JobItemLoader(item=JobcrawlerItem(), selector=job)
-            item['job_id'] = job.xpath('.//p/input/@value').extract()
             # strip去除前后空格,extract的结果是list，用join结合为字符串再进行strip，避免中文乱码
             job_name = job.xpath('.//p/span/a/text()').extract()
             item['job_name'] = ''.join(job_name).strip()
@@ -44,11 +34,18 @@ class JobSpider(Spider):
             item['salary'] = job.xpath('.//span[@class="t4"]/text()').extract()
             item['time'] = job.xpath('.//span[@class="t5"]/text()').extract()
             yield item
-        
+            # job_name = job.xpath('.//p/span/a/text()').extract()
+            # loader.add_xpath('job_name', './/p/span/a/text()')
+            # loader.add_xpath('company', './/span[@class="t2"]/a/text()')
+            # loader.add_xpath('address', './/span[@class="t3"]/text()')
+            # loader.add_xpath('salary', './/span[@class="t4"]/text()')
+            # loader.add_xpath('time', './/span[@class="t5"]/text()')
+
+            # yield loader.load_item()
+        # next_url = response.xpath('/html/body/div[2]/div[6]/div/div/div/ul/li[8]/a/@href').extract()
         next_url = response.xpath('//div[@class="p_in"]/ul/li[8]/a/@href').extract()
         if next_url:
             # 注意extract是list，所以要转化为str
             next_url = ''.join(next_url)
             yield Request(next_url, headers=self.headers)
-
 

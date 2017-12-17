@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 
+# Define here the models for your scraped items
+# 
+# See documentation in:
+# http://doc.scrapy.org/en/latest/topics/items.html
+
+
 import scrapy
 from scrapy.contrib.loader import ItemLoader
 from scrapy.contrib.loader.processor import TakeFirst, Join, MapCompose
 
 
 class JobcrawlerItem(scrapy.Item):
-    # 职位ID
-    job_id = scrapy.Field()
     # 职位名
     job_name = scrapy.Field()
     # 公司名
@@ -18,10 +22,6 @@ class JobcrawlerItem(scrapy.Item):
     salary = scrapy.Field()
     # 发布时间
     time = scrapy.Field()
-    # 底薪
-    bottomSalary = scrapy.Field()
-    # 最高薪资
-    topSalary = scrapy.Field()
     
 
 class JobItemLoader(ItemLoader):
