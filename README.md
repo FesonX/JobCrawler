@@ -57,6 +57,9 @@ def parse(self, response):
 
 ### Now Coding with Python3
 
+### Now Develop with Scrapy 1.5
+But I haven't found it any incompatible with old ver.
+
 ### Add new Spider to the Project
 Source Code in `JobCrawler/spiders/entrance.py`
 Also add new Scrapy field for the new spider, source code in `JobCrawler/items.py`
