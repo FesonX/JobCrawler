@@ -13,18 +13,26 @@ class JobcrawlerItem(scrapy.Item):
     # 公司名
     company = scrapy.Field()
     # 工作地点
-    address = scrapy.Field()
+    job_city = scrapy.Field()
     # 工资
     salary = scrapy.Field()
     # 发布时间
-    time = scrapy.Field()
+    create_time = scrapy.Field()
     # 底薪
-    bottomSalary = scrapy.Field()
+    salary_min = scrapy.Field()
     # 最高薪资
-    topSalary = scrapy.Field()
+    salary_max = scrapy.Field()
+    # 为了便于分类, 引入搜索关键词
+    key_word = scrapy.Field()
     
 
 class JobItemLoader(ItemLoader):
     default_output_processor = TakeFirst()
     review_in = MapCompose(lambda x: x.replace("\n", " "))
     review_out = Join()
+
+class EntranceItem(scrapy.Item):
+    # 搜索关键词
+    key_word = scrapy.Field()
+    # 所属领域
+    key_field = scrapy.Field()

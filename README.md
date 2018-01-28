@@ -52,3 +52,16 @@ def parse(self, response):
 ```
 
 ### Now you can insert data into database via scrapy pipeline
+
+## Version 1.2
+
+### Now Coding with Python3
+
+### Add new Spider to the Project
+Source Code in `JobCrawler/spiders/entrance.py`
+Also add new Scrapy field for the new spider, source code in `JobCrawler/items.py`
+
+### Fix some bugs in Pipeline
+**Here is what bugs fixed**
+1. str to float error(*because of the string Segmentation ERROR*)
+2. all spiders share the same pipeline method
