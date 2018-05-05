@@ -22,6 +22,8 @@ class JobcrawlerItem(scrapy.Item):
     salary_min = scrapy.Field()
     # 最高薪资
     salary_max = scrapy.Field()
+    # 平均工资
+    salary_avg = scrapy.Field()
     # 为了便于分类, 引入搜索关键词
     key_word = scrapy.Field()
     

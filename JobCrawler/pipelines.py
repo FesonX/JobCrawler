@@ -4,10 +4,13 @@ import codecs
 import csv
 import re
 import sys
+import datetime
 
 import pandas
 import pymysql
+import pymongo
 from scrapy.exceptions import DropItem
+from scrapy.conf import settings
 
 '''
 注释部分为以前写的Python2代码
@@ -15,7 +18,27 @@ from scrapy.exceptions import DropItem
 # reload(sys)
 # sys.setdefaultencoding('utf8')
 
+# class JobInfoPipeline(object):
+    
+
+#     def process_item(self, item, spider):
+#         postItem = dict(item)
+#         self.coll.insert(postItem)
+#         return item
+
 class jobCrawlerPipeline(object):
+    """
+    use for connecting to mongodb
+    """
+    def __init__(self):
+        # connect to db
+        self.client = pymongo.MongoClient(host=settings['MONGO_HOST'], port=settings['MONGO_PORT'])
+        # ADD if NEED account and password
+        # self.client.admin.authenticate(host=settings['MONGO_USER'], settings['MONGO_PSW'])
+        self.db = self.client[settings['MONGO_DB']]
+        self.coll = self.db[settings['MONGO_COLL']]
+
+
     """
     spider pipeline
     """
@@ -33,53 +56,53 @@ class jobCrawlerPipeline(object):
                     # XX千以下
                     postion = word.find('以下')
                     # salary_min = str(word[:(postion - 5)])
-                    salary_min = str(word[:(postion - 1)])
+                    salary_min = (word[:(postion - 1)])
                 elif (word.find('以上') != -1):
                     postion = word.find('以上')
                     # salary_min = str(float(word[:postion - 5]))
-                    salary_min = str(float(word[:postion - 1]))
+                    salary_min = (float(word[:postion - 1]))
                 else:
                     # XX千/月
                     postion = word.find('-')
-                    salary_min = str(float(word[:(postion)]))
+                    salary_min = (float(word[:(postion)]))
             else:
                 if (word.find('年') == -1):
                     if (word.find('以下') != -1):
                         # XX万以下
                         postion = word.find('以下')
                         # salary_min = str(float(word[:(postion - 5)]) * 10)
-                        salary_min = str(float(word[:(postion - 1)]) * 10)
+                        salary_min = (float(word[:(postion - 1)]) * 10)
                     elif (word.find('以上') != -1):
                         # XX万以上
                         postion = word.find('以上')
                         # salary_min = str(float(word[:postion - 5]) * 10)
-                        salary_min = str(float(word[:postion - 1]) * 10)
+                        salary_min = (float(word[:postion - 1]) * 10)
                     elif (word.find('+') != -1):
                         # XX万+
                         postion = word.find('+')
-                        salary_min = str(float(word[:(postion)]) * 10)
+                        salary_min = (float(word[:(postion)]) * 10)
                     else:
                         # XX万/月
                         postion = word.find('-')
-                        salary_min = str(float(word[:(postion)]) * 10)
+                        salary_min = (float(word[:(postion)]) * 10)
 
                 else:
                     if (word.find('以下') != -1):
                         # XX万以下/年
                         postion = word.find('以下')
-                        salary_min = str(float(word[:(postion - 1)]) / 1.2)
+                        salary_min = (float(word[:(postion - 1)]) / 1.2)
                     elif (word.find('以上') != -1):
                         postion = word.find('以上')
-                        salary_min = str(float(word[:postion - 1]) / 1.2)
+                        salary_min = (float(word[:postion - 1]) / 1.2)
                     elif (word.find('+') != -1):
                         # XX万+
                         postion = word.find('+')
-                        salary_min = str(float(word[:(postion)]) / 1.2)
+                        salary_min = (float(word[:(postion)]) / 1.2)
                     else:
                         # XX万/年
                         postion = word.find('-')
                         salary_min = word[:(postion)]
-                        salary_min = str(float(salary_min) / 1.2)
+                        salary_min = (float(salary_min) / 1.2)
             return salary_min
 
         if method == 'top':
@@ -89,11 +112,11 @@ class jobCrawlerPipeline(object):
                     # XX千以下
                     postion = word.find('以下')
                     # salary_max = str(float(word[:(postion - 5)]))
-                    salary_max = str(float(word[:(postion - 1)]))
+                    salary_max = (float(word[:(postion - 1)]))
                 elif (word.find('以上') != -1):
                     postion = word.find('以上')
                     # salary_max = str(float(word[:postion - 5]))
-                    salary_max = str(float(word[:(postion - 1)]))
+                    salary_max = (float(word[:(postion - 1)]))
                 else:
                     # XX千/月
                     postion = word.find('-')
@@ -105,89 +128,52 @@ class jobCrawlerPipeline(object):
                         # XX万以下
                         postion = word.find('以下')
                         # salary_max = str(float(word[:(postion - 5)]) * 10)
-                        salary_max = str(float(word[:(postion - 1)]) * 10)
+                        salary_max = (float(word[:(postion - 1)]) * 10)
                     elif (word.find('以上') != -1):
                         # XX万以上
                         postion = word.find('以上')
                         # salary_max = str(float(word[:postion - 5]) * 10)
-                        salary_max = str(float(word[:(postion - 1)]) * 10)
+                        salary_max = (float(word[:(postion - 1)]) * 10)
                     else:
                         # XX万/月
                         postion = word.find('-')
                         # salary_max = str(float(word[(postion + 1):(length - 11)]) * 10)
-                        salary_max = str(float(word[postion + 1:(len(word) - 3)]) * 10)
+                        salary_max = (float(word[postion + 1:(len(word) - 3)]) * 10)
 
                 else:
                     if (word.find('以下') != -1):
                         # XX万以下/年
                         postion = word.find('以下')
                         # salary_max = str(float(word[:(postion - 5)]) / 1.2)
-                        salary_max = str(float(word[:(postion - 1)]) / 1.2)
+                        salary_max = (float(word[:(postion - 1)]) / 1.2)
                     elif (word.find('以上') != -1):
                         # XX万以上一年
                         postion = word.find('以上')
                         # salary_max = str(float(word[:postion - 5]) / 1.2)
-                        salary_max = str(float(word[:(postion - 1)]) / 1.2)
+                        salary_max = (float(word[:(postion - 1)]) / 1.2)
                     elif (word.find('+') != -1):
                         # XX万+
                         postion = word.find('+')
-                        salary_max = str(float(word[:(postion)]) / 1.2)
+                        salary_max = (float(word[:(postion)]) / 1.2)
                     else:
                         # XX万/年
                         postion = word.find('-')
                         # salary_max = word[(postion + 1):(length - 11)]
                         salary_max = word[(postion + 1):(len(word) - 3)]
-                        salary_max = str(int(salary_max) / 1.2)
+                        salary_max = (int(salary_max) / 1.2)
             return salary_max
 
     def open_spider(self, spider):
         # """
         # called when open the spider
-        # create database connection
+        # you can create database connection here
         # """
-        # self.conn = pymysql.connect(
-        #     host='localhost',
-        #     user='root',
-        #     passwd='mysql',
-        #     db='scrapyDB',
-        #     charset='utf8',
-        #     cursorclass=pymysql.cursors.DictCursor)
         pass
 
     def close_spider(self, spider):
         # """
         # called when close the spider
-        # open the csv and then insert data into database
         # """
-        # try:
-        #     # open the cursor
-        #     self.cursor = self.conn.cursor()
-
-        #     # get data from csv file
-        #     # reload data
-        #     f = open(r'job.csv', 'r')
-        #     f.close()
-        #     job_info = pandas.read_csv(r'job.csv', iterator=True,chunksize=1,
-        #                                header=None,names=
-        #                                ['job_id','job_name','company','address','bottom_salary','top_salary','salary','time'])
-
-        #     # store data
-        #     for i, job in enumerate (job_info):
-        #         # use -1 or ' ' to fill NAN
-        #         job = job.fillna({'job_name':'','company':'','address':'','time':''})
-        #         job = job.fillna(-1)
-        #         # transform series to list type
-        #         job = job.values[0]
-
-        #         sql = 'INSERT INTO tb_job(job_id,job_name,company,address,bottom_salary,top_salary,salary,time)' \
-        #               'VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s")' % (
-        #               job[1], job[7], job[3], job[5], job[2], job[6], job[0], job[4])
-        #         self.cursor.execute(sql)
-        #     self.conn.commit()
-
-        # finally:
-        #     # close the connection
-        #     self.conn.close()
         pass
 
 
@@ -209,9 +195,19 @@ class jobCrawlerPipeline(object):
                 raise DropItem("Dirty data %s" % item)
 
             # sort out data
+
+            # 添加51Job缺失的年份,在跨年份的爬取可能会出错
+            day = ''.join(item['create_time'])
+            day = datetime.datetime.strptime(day, '%m-%d')
+            day = day.replace(datetime.date.today().year) 
+            item['create_time'] = day
+
             salary = ''.join(salary)
-            item['salary_min'] = self.cut_word(salary, method='bottom')
-            item['salary_max'] = self.cut_word(salary, method='top')
+
+            item['salary_min'] = float(self.cut_word(salary, method='bottom'))
+            item['salary_max'] = float(self.cut_word(salary, method='top'))
+            # To Reduce Compute Time in Django, let Scrapy Pipeline compute average salary
+            item['salary_avg'] = round((item['salary_max'] + item['salary_min'] / 2), 2)
         if spider.name == 'entrance':
             key_word = item['key_word']
 
@@ -219,5 +215,8 @@ class jobCrawlerPipeline(object):
 
             if(dirty_key_word.search(str(key_word))):
                 raise DropItem("Dirty data %s" % item)
+
+        postItem = dict(item)
+        self.coll.insert(postItem)
 
         return item

@@ -7,3 +7,4 @@
 *.egg-info
 dist
 build
+JobCrawler/data/job.csv
