@@ -1,7 +1,13 @@
 # JobCrawler
 
 ## Intro
-Scrapy Project For Crawling Job Information on 51Job
+Scrapy Project For Crawling Job Information on 51Job Based on Python3.
+
+> (You can check out the commits before to get project based on Python2, 
+but it's not recommended due to Python2 doesn't support Chinese very well
+and many modules don't support Python2 any more.)
+
+In the latest version, the project now use MongoDB to save data.
 
 ## About Scrapy
 
@@ -34,7 +40,7 @@ class JobSpider(Spider):
     ...
 
 ```
-The spider uses a csv file in `/data` , you need to `cd ` to `\spiders` to **run JobCrawler**
+The spider uses a csv file in `/data` , you need to `cd ` to `/spiders` to **run JobCrawler**
 
 ## Version Update Information
 
