@@ -26,6 +26,8 @@ http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 
 
 ## Run JobCrawler
+Before running the Spider, type`pip install -r requirements.txt` in terminal to install requirements.
+
 ```python
 scrapy crawl jobCrawler
 

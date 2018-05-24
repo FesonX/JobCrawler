@@ -22,6 +22,8 @@ http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 ```
 
 ## 运行
+项目运行前, 在终端输入`pip install -r requirements.txt` 安装项目依赖
+
 ```python
 scrapy crawl jobCrawler
 

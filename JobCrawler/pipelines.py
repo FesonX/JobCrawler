@@ -12,9 +12,6 @@ import pymongo
 from scrapy.exceptions import DropItem
 from scrapy.conf import settings
 
-'''
-注释部分为以前写的Python2代码
-'''
 # reload(sys)
 # sys.setdefaultencoding('utf8')
 
@@ -199,7 +196,8 @@ class jobCrawlerPipeline(object):
             # 添加51Job缺失的年份,在跨年份的爬取可能会出错
             day = ''.join(item['create_time'])
             day = datetime.datetime.strptime(day, '%m-%d')
-            day = day.replace(datetime.date.today().year) 
+            day = day.replace(datetime.date.today().year)
+            day = datetime.datetime.strptime(str(day), '%Y-%m-%d') 
             item['create_time'] = day
 
             salary = ''.join(salary)
