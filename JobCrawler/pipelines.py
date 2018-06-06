@@ -197,7 +197,7 @@ class jobCrawlerPipeline(object):
             day = ''.join(item['create_time'])
             day = datetime.datetime.strptime(day, '%m-%d')
             day = day.replace(datetime.date.today().year)
-            day = datetime.datetime.strptime(str(day), '%Y-%m-%d') 
+            # day = datetime.datetime.strptime(str(day), '%Y-%m-%d') 
             item['create_time'] = day
 
             salary = ''.join(salary)
