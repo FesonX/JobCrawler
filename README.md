@@ -1,6 +1,8 @@
 # JobCrawler
+[中文版](README_Zh-CN.md)
 
 ## Intro
+---------------------------
 Scrapy Project For Crawling Job Information on 51Job Based on Python3.
 
 > (You can check out the commits before to get project based on Python2, 
@@ -9,7 +11,9 @@ and many modules don't support Python2 any more.)
 
 In the latest version, the project now use MongoDB to save data.
 
+
 ## About Scrapy
+----------------------------
 
 ### Get docs from Scrapy(Chinese Ver. Avaiable)
 ```
@@ -20,13 +24,54 @@ http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/overview.html
 http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 ```
 
-## Simple data
+
+## Sample data
+-----------------------------
 
 >`job.csv` include job data about `python` from `51job`
 
 
 ## Run JobCrawler
-Before running the Spider, type`pip install -r requirements.txt` in terminal to install requirements.
+------------------------------
+
+### Install Python3
+
+```
+sudo add-apt-repository ppa:fkrull/deadsnakes
+
+sudo apt-get update
+
+sudo apt-get install python3.6
+```
+To make Python3.6 as default Python Version, read this [arcticle](https://blog.csdn.net/fireflychh/article/details/78195778)
+
+### Install Virtualenv(Or Use Pycharm, Anaconda as lib manager)
+
+```shell
+# Install
+pip3 install virtualenv
+# Create
+virtualenv spider-env
+# Activate
+source spider-env/bin/activate
+# Quit
+deactivate
+```
+
+### Install requirements
+type this command first
+```shell
+ sudo apt-get install libpython3.6-dev
+```
+Because scrapy require `Python.h`
+
+Than type`pip install -r requirements.txt`
+If Failed, try open the `requirements.txt`, and  type `pip install` one by one.
+
+### Install MongoDB
+[Install MongoDB Community Edition](https://docs.mongodb.com/manual/administration/install-community/)
+
+### Run Spider
 **type `cd` to the root directory of the project because of the file `field.csv`**
 
 ```python
@@ -106,9 +151,9 @@ def process_item(self, item, spider):
     # sort out data
     ...
     day = ''.join(item['create_time'])
-            day = datetime.datetime.strptime(day, '%m-%d')
-            day = day.replace(datetime.date.today().year) 
-            item['create_time'] = day
+    day = datetime.datetime.strptime(day, '%m-%d')
+    day = day.replace(datetime.date.today().year) 
+    item['create_time'] = day
     ...
 
 ```
