@@ -17,7 +17,7 @@ class JobSpider(Spider):
 
     def start_requests(self):
 
-        file_csv = pd.read_csv('../data/field.csv')
+        file_csv = pd.read_csv('field.csv')
         data = []
         for i in file_csv.values:
             # 把DataFrame格式转为list

@@ -27,6 +27,7 @@ http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 
 ## Run JobCrawler
 Before running the Spider, type`pip install -r requirements.txt` in terminal to install requirements.
+**type `cd` to the root directory of the project because of the file `field.csv`**
 
 ```python
 scrapy crawl jobCrawler
@@ -42,7 +43,7 @@ class JobSpider(Spider):
     ...
 
 ```
-The spider uses a csv file in `/data` , you need to `cd ` to `/spiders` to **run JobCrawler**
+
 
 ## Version Update Information
 

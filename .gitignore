@@ -8,3 +8,4 @@
 dist
 build
 JobCrawler/data/job.csv
+JobCrawler/Pipfile
