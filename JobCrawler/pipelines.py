@@ -1,27 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import codecs
-import csv
 import re
-import sys
 import datetime
 
-import pandas
-import pymysql
 import pymongo
 from scrapy.exceptions import DropItem
 from scrapy.conf import settings
 
-# reload(sys)
-# sys.setdefaultencoding('utf8')
-
-# class JobInfoPipeline(object):
-    
-
-#     def process_item(self, item, spider):
-#         postItem = dict(item)
-#         self.coll.insert(postItem)
-#         return item
 
 class jobCrawlerPipeline(object):
     """
