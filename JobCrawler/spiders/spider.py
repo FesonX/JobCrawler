@@ -23,23 +23,36 @@ class JobSpider(Spider):
             # 把DataFrame格式转为list
             data.append(i[1])
 
-        while(1):
-            area = input('请选择职位地区数字：1.全国， 2.东莞')
+        area_top = {'010000': '北京', '020000': '上海', '030200': '广州', '040000': '深圳', \
+        '200200': '西安', '180200': '武汉', '080200': '杭州', '070200': '南京', '090200': '成都',\
+        '060000': '重庆', '230200': '沈阳', '120300': '青岛', '080300': '宁波', '170200': '郑州', \
+        '050000': '天津', '070300': '苏州', '190200': '长沙', '070400': '无锡', '030800': '东莞', '01': '珠三角'}
 
-            if(str(area) != '1' and area != '2'):
-                print("输入有误，请重新输入")
-            else:
-                break
+        area_top.keys()
+
+        # 珠三角地区 惠州、汕头、珠海、佛山、中山、江门、湛江、肇庆、清远
+        #area_zhusanjiao = 01
+
+        # while(1):
+        #     area = input('请选择职位地区数字：1.全国， 2.东莞')
+
+        #     if(str(area) != '1' and area != '2'):
+        #         print("输入有误，请重新输入")
+        #     else:
+        #         break
         allowed_domain = ['http://search.51job.com']
         for keyword in data:
-            if area == '1':
-                url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&keyword=%s' \
-               '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (keyword)
-            if(area == '2'):
-                url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=030800&keyword=%s' \
-               '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (keyword)
-            # 使用meta传递key_word搜索关键词
-            yield Request(url, headers=self.headers, meta={'key_word': keyword})   
+            # if area == '1':
+            #     url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&keyword=%s' \
+            #    '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (keyword)
+            # if(area == '2'):
+            #     url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=030800&keyword=%s' \
+            #    '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (keyword)
+            for area in area_top.keys():
+                url = 'http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=%s&keyword=%s' \
+                '&keywordtype=2&lang=c&stype=2&postchannel=0000&fromType=1&confirmdate=9' % (area, keyword)
+                # 使用meta传递key_word搜索关键词
+                yield Request(url, headers=self.headers, meta={'key_word': keyword, 'area': area_top[area]})   
 
 
     def parse(self, response):
@@ -55,6 +68,7 @@ class JobSpider(Spider):
             item['job_name'] = ''.join(job_name).strip()
             item['company'] = job.xpath('.//span[@class="t2"]/a/text()').extract()
             item['job_city'] = job.xpath('.//span[@class="t3"]/text()').extract()
+            item['area'] = response.meta['area']
             item['salary'] = job.xpath('.//span[@class="t4"]/text()').extract()
             item['create_time'] = job.xpath('.//span[@class="t5"]/text()').extract()
             yield item
