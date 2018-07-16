@@ -18,7 +18,7 @@ class jobCrawlerPipeline(object):
         # ADD if NEED account and password
         # self.client.admin.authenticate(host=settings['MONGO_USER'], settings['MONGO_PSW'])
         self.db = self.client[settings['MONGO_DB']]
-        self.coll = self.db[settings['MONGO_COLL']]
+        # self.coll = self.db[settings['MONGO_COLL']]
 
 
     """
@@ -200,6 +200,7 @@ class jobCrawlerPipeline(object):
                 raise DropItem("Dirty data %s" % item)
 
         postItem = dict(item)
+        self.coll = self.db['job']
         self.coll.insert(postItem)
 
         return item

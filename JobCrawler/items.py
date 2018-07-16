@@ -14,6 +14,8 @@ class JobcrawlerItem(scrapy.Item):
     company = scrapy.Field()
     # 工作地点
     job_city = scrapy.Field()
+    # 区域
+    area = scrapy.Field()
     # 工资
     salary = scrapy.Field()
     # 发布时间
