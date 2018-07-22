@@ -82,7 +82,6 @@ class jobCrawlerPipeline(object):
             return salary_min
 
         if method == 'top':
-            length = len(word)
             if (word.find('万') == -1):
                 if (word.find('以下') != -1):
                     # XX千以下
@@ -145,7 +144,16 @@ class jobCrawlerPipeline(object):
 
 
     def process_item(self, item, spider):
+        # from scrapy.exceptions import CloseSpider
         if spider.name == 'jobCrawler':
+            # 添加51Job缺失的年份,在跨年份的爬取可能会出错
+            # day = ''.join(item['create_time'])
+            # day = datetime.datetime.strptime(day, '%m-%d')
+            # day = day.replace(datetime.date.today().year)
+            # # day = datetime.datetime.strptime(str(day), '%Y-%m-%d') 
+            # item['create_time'] = day
+
+
             # Get data from item
             job_name = item['job_name']
             salary = item['salary']
@@ -163,19 +171,12 @@ class jobCrawlerPipeline(object):
 
             # sort out data
 
-            # 添加51Job缺失的年份,在跨年份的爬取可能会出错
-            day = ''.join(item['create_time'])
-            day = datetime.datetime.strptime(day, '%m-%d')
-            day = day.replace(datetime.date.today().year)
-            # day = datetime.datetime.strptime(str(day), '%Y-%m-%d') 
-            item['create_time'] = day
-
             salary = ''.join(salary)
 
             item['salary_min'] = float(self.cut_word(salary, method='bottom'))
             item['salary_max'] = float(self.cut_word(salary, method='top'))
             # To Reduce Compute Time in Django, let Scrapy Pipeline compute average salary
-            item['salary_avg'] = round((item['salary_max'] + item['salary_min'] / 2), 2)
+            item['salary_avg'] = round((item['salary_max'] + item['salary_min']) / 2, 2)
         if spider.name == 'entrance':
             key_word = item['key_word']
 

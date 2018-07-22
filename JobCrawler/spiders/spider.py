@@ -4,9 +4,9 @@ import json
 from scrapy import Request
 from scrapy.spiders import Spider
 # 下面的import是正确的，但在pycharm中会有红色警告横线，改用..items
-# from douban.items import DoubanMovieItem, JobItem
 from ..items import JobcrawlerItem, JobItemLoader
 import pandas as pd 
+from pymongo import MongoClient
 
 
 class JobSpider(Spider):
@@ -58,19 +58,33 @@ class JobSpider(Spider):
     def parse(self, response):
         item = JobcrawlerItem()
         jobs = response.xpath('//*[@id="resultList"]/div[@class="el"]')
-        
+
         for job in jobs:
-            loader = JobItemLoader(item=JobcrawlerItem(), selector=job)
-            item['key_word'] = response.meta['key_word']
+            client = MongoClient()
+            db = client['Spider']
+            coll = db.job
+            from scrapy.exceptions import CloseSpider
+            import datetime
+
+            
             item['job_id'] = job.xpath('.//p/input/@value').extract()
+            item['create_time'] = job.xpath('.//span[@class="t5"]/text()').extract()
+            item['company'] = job.xpath('.//span[@class="t2"]/a/text()').extract()
             # strip去除前后空格,extract的结果是list，用join结合为字符串再进行strip，避免中文乱码
             job_name = job.xpath('.//p/span/a/text()').extract()
             item['job_name'] = ''.join(job_name).strip()
-            item['company'] = job.xpath('.//span[@class="t2"]/a/text()').extract()
+            day = ''.join(item['create_time'])
+            day = datetime.datetime.strptime(day, '%m-%d')
+            day = day.replace(datetime.date.today().year)
+            if(coll.find_one() is not None):
+                if (coll.find_one()['job_id'] == item['job_id']):
+                    raise CloseSpider("Duplicate Data")
+
+            item['create_time'] = day
+            item['key_word'] = response.meta['key_word']
             item['job_city'] = job.xpath('.//span[@class="t3"]/text()').extract()
             item['area'] = response.meta['area']
             item['salary'] = job.xpath('.//span[@class="t4"]/text()').extract()
-            item['create_time'] = job.xpath('.//span[@class="t5"]/text()').extract()
             yield item
         
         next_url = response.xpath('//div[@class="p_in"]/ul/li[8]/a/@href').extract()

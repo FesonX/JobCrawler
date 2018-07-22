@@ -6,14 +6,21 @@ the page.**_
 
 ## 简介
 -------------------------------
-基于Python3的Scrapy爬虫项目, 主爬取网站为51Job, 次爬取网站为拉勾网
+1. 基于Python3的Scrapy爬虫项目, 主爬取网站为51Job, 次爬取网站为拉勾网
 
-项目在Ubuntu17.10上开发, 在Mac OS上或其他Linux衍生系统上运行可能有少许命令上的不同.
-不建议在Windows上运行本项目.
+2. 项目在Ubuntu17.10 以及 Deepin 上开发, 在 Mac OS 上或其他 Linux 衍生系统上运行可能有少许命令上的不同.
+不建议在 Windows 上运行本项目.可能会有一些奇怪的错误, 当然, 你喜欢我也阻止不了(逃
 
-> 在项目最初的Commit中基于Python2, 但Python2对中文编码不友好,且未来将失去很多模块支持.
+3. 在项目最初的Commit中基于Python2, 但Python2对中文编码不友好,且未来将失去很多模块支持.
 
-基于存储速度的考量,在最新的版本中, 项目使用MonogoDB存储,你仍然可以输出`*.csv`文件.
+4. 基于存储速度的考量,在最新的版本中, 项目使用MonogoDB存储,你仍然可以输出`*.csv`文件.
+
+5. 现已支持类似于增量爬取的功能, 利用与数据库最新一条数据与正在爬取数据的日期公司职位对比, 相同则抛出异常终止爬取
+**注意:** 由于 Scrapy 是多线程引擎, 在抛出异常后, 需要逐个关闭, 所以需要一定时间, 因此在终端会有正在爬取的网址输出
+而且仍有十几条数据会发生重复,考虑到和几万条数据量的对比,仍在容错的范围内
+
+此方法较为适用于每天 0 点时爬取, 此时爬取不会漏掉数据更新.
+**对于数据高度匹配的文章等爬取, 此方法更为适用**
 
 提供基于Django和HighCharts数据可视化项目, 详情请点击[JobDataViewer](https://github.com/FesonX/JobDataViewer)
 
@@ -21,12 +28,9 @@ the page.**_
 **有问题欢迎邮箱(fesonx@foxmail.com)或issue,喜欢记得star**
 
 ## 关于Python3
--------------------------------
 ### 可以搜索廖雪峰, 参考学习Python3. 慕课网上亦有相关教程
 
 ## 关于Scrapy
--------------------------------
-
 ### 可以在官方网站获取Scrapy文档学习
 ```
 http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/overview.html
@@ -38,7 +42,6 @@ http://scrapy-chs.readthedocs.io/zh_CN/0.24/intro/install.html#scrapy
 ```
 
 ## 运行
--------------------------------
 ### 安装相关依赖
 #### 1. 安装Python3
 项目使用Python3.6, 可以使用以下连接安装, 将文中的3.5改为3.6即可.
@@ -262,3 +265,39 @@ The project I built recently is a Django project for data visualization.
 
 I need to reduce the compute time in that project as much as posssible to get faster
 when user visit the page.
+
+
+### Stop Crawling duplicate data support (July.22)
+
+Stop Crawling Duplicate Data by get the newest data from database,
+And then compare its datetime with the data crawling now.
+If equals, raise CloseSpider.
+
+**Note that scrapy is a muti-process engine, once you raise CloseSpider,**
+**It would stop the process one by one, so u may see some crawl message on the terminal.**
+
+```python
+# spider.py
+...
+
+def parse(self, response):
+        item = JobcrawlerItem()
+        jobs = response.xpath('//*[@id="resultList"]/div[@class="el"]')
+
+        for job in jobs:
+            client = MongoClient()
+            db = client['Spider']
+            coll = db.job
+            from scrapy.exceptions import CloseSpider
+            import datetime
+
+            item['create_time'] = job.xpath('.//span[@class="t5"]/text()').extract()
+            day = ''.join(item['create_time'])
+            day = datetime.datetime.strptime(day, '%m-%d')
+            day = day.replace(datetime.date.today().year)
+            if (coll.find_one()['create_time'] == day):
+                raise CloseSpider("Duplicate Data")
+            
+...
+
+```
