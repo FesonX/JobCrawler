@@ -31,16 +31,13 @@ class jobCrawlerPipeline(object):
         add top_salary field
         """
         if method == 'bottom':
-            length = len(word)
             if (word.find('万') == -1):
                 if (word.find('以下') != -1):
                     # XX千以下
                     postion = word.find('以下')
-                    # salary_min = str(word[:(postion - 5)])
                     salary_min = (word[:(postion - 1)])
                 elif (word.find('以上') != -1):
                     postion = word.find('以上')
-                    # salary_min = str(float(word[:postion - 5]))
                     salary_min = (float(word[:postion - 1]))
                 else:
                     # XX千/月
@@ -51,12 +48,10 @@ class jobCrawlerPipeline(object):
                     if (word.find('以下') != -1):
                         # XX万以下
                         postion = word.find('以下')
-                        # salary_min = str(float(word[:(postion - 5)]) * 10)
                         salary_min = (float(word[:(postion - 1)]) * 10)
                     elif (word.find('以上') != -1):
                         # XX万以上
                         postion = word.find('以上')
-                        # salary_min = str(float(word[:postion - 5]) * 10)
                         salary_min = (float(word[:postion - 1]) * 10)
                     elif (word.find('+') != -1):
                         # XX万+
@@ -92,45 +87,37 @@ class jobCrawlerPipeline(object):
                 if (word.find('以下') != -1):
                     # XX千以下
                     postion = word.find('以下')
-                    # salary_max = str(float(word[:(postion - 5)]))
                     salary_max = (float(word[:(postion - 1)]))
                 elif (word.find('以上') != -1):
                     postion = word.find('以上')
-                    # salary_max = str(float(word[:postion - 5]))
                     salary_max = (float(word[:(postion - 1)]))
                 else:
                     # XX千/月
                     postion = word.find('-')
-                    # salary_max = str(float(word[(postion + 1):(length - 11)]))
                     salary_max = word[postion + 1:(len(word) - 3)]
             else:
                 if (word.find('年') == -1):
                     if (word.find('以下') != -1):
                         # XX万以下
                         postion = word.find('以下')
-                        # salary_max = str(float(word[:(postion - 5)]) * 10)
                         salary_max = (float(word[:(postion - 1)]) * 10)
                     elif (word.find('以上') != -1):
                         # XX万以上
                         postion = word.find('以上')
-                        # salary_max = str(float(word[:postion - 5]) * 10)
                         salary_max = (float(word[:(postion - 1)]) * 10)
                     else:
                         # XX万/月
                         postion = word.find('-')
-                        # salary_max = str(float(word[(postion + 1):(length - 11)]) * 10)
                         salary_max = (float(word[postion + 1:(len(word) - 3)]) * 10)
 
                 else:
                     if (word.find('以下') != -1):
                         # XX万以下/年
                         postion = word.find('以下')
-                        # salary_max = str(float(word[:(postion - 5)]) / 1.2)
                         salary_max = (float(word[:(postion - 1)]) / 1.2)
                     elif (word.find('以上') != -1):
                         # XX万以上一年
                         postion = word.find('以上')
-                        # salary_max = str(float(word[:postion - 5]) / 1.2)
                         salary_max = (float(word[:(postion - 1)]) / 1.2)
                     elif (word.find('+') != -1):
                         # XX万+
@@ -139,7 +126,6 @@ class jobCrawlerPipeline(object):
                     else:
                         # XX万/年
                         postion = word.find('-')
-                        # salary_max = word[(postion + 1):(length - 11)]
                         salary_max = word[(postion + 1):(len(word) - 3)]
                         salary_max = (int(salary_max) / 1.2)
             return salary_max
