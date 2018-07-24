@@ -17,11 +17,19 @@ the page.**_
 
 5. 现已支持类似于增量爬取的功能, 利用与数据库最新一条数据与正在爬取数据的 id 对比, 相同则抛出异常终止爬取
 **注意:** 由于 Scrapy 是多线程引擎, 在抛出异常后, 需要逐个关闭, 所以需要一定时间, 因此在终端会有正在爬取的网址输出
-
-6. 在 pipeline 中添加去重代码, 使用 `find_one()` 函数来节省搜索时间, 对比字段是 `job_id`
-
 此方法较为适用于每天 0 点时爬取, 此时爬取不会漏掉数据更新.
 **对于数据高度匹配的文章等爬取, 此方法更为适用**
+
+6. 在 pipeline 中添加去重代码, 使用 `find_one()` 函数来节省搜索时间, 对比字段是 `job_id`, 感谢 [@Chen4089](https://github.com/chen4089)
+
+7. 现已支持 crontab 定时爬取功能, 目前设定为每周一三五 0 点爬取, 输出 _当前日期.csv_ 文件至 `data` 文件夹
+感谢 [@Jlinka](https://github.com/jlinka)
+测试定时爬取时在终端键入 `tail -f /var/log/cron.log` 查看运行情况
+注意如果爬虫或脚本出现错误时不会出现在该日志中, 请使用 `sh startup.sh` 测试通过后再让 crontab 任务运行.
+**参考:** 
+[crontab 定时任务](http://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/crontab.html)
+[记录配置python爬虫定时任务crontab所踩过的坑](https://blog.csdn.net/ningningjj/article/details/80884611)
+
 
 提供基于Django和HighCharts数据可视化项目, 详情请点击[JobDataViewer](https://github.com/FesonX/JobDataViewer)
 
@@ -301,4 +309,36 @@ def parse(self, response):
             
 ...
 
+```
+
+###  Duplicate data detection support (July.24)
+
+Thanks to [@Chen4089](https://github.com/chen4089)
+
+```python
+# pipeline.py
+class jobCrawlerPipeline(object):
+    ...
+
+    def process_item(self, item, spider):
+        # from scrapy.exceptions import CloseSpider
+        if spider.name == 'jobCrawler':
+            self.coll = self.db['job']
+
+            if (self.coll.find_one({"job_id": item['job_id']}) == None): 
+                job_name = item['job_name']
+                salary = item['salary']
+
+    ...
+```
+
+### Crawl Timer support (July.24)
+
+Thanks to [@Jlinka](https://github.com/jlinka)
+
+Check the following files for detail:
+```shell
+ubuntucron
+startup.sh
+run.py
 ```
