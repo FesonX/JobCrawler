@@ -14,7 +14,8 @@ SPIDER_MODULES = ['JobCrawler.spiders']
 NEWSPIDER_MODULE = 'JobCrawler.spiders'
 
 ITEM_PIPELINES={
-    'JobCrawler.pipelines.jobCrawlerPipeline': 100
+    'JobCrawler.pipelines.jobCrawlerPipeline': 100,
+    'JobCrawler.pipelines.SaveToCsvPipeline':200
 }
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'JobCrawler (+http://www.yourdomain.com)'

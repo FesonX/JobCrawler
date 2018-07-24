@@ -9,3 +9,6 @@ dist
 build
 JobCrawler/data/job.csv
 JobCrawler/Pipfile
+data/2018-07-24 20-12-55.csv
+data/2018-07-24 20-46-45.csv
+data/2018-07-24 21-29-02.csv

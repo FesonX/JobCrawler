@@ -66,20 +66,21 @@ class JobSpider(Spider):
             from scrapy.exceptions import CloseSpider
             import datetime
 
-            
             item['job_id'] = job.xpath('.//p/input/@value').extract()
+            
+            if(coll.find_one() is not None):
+                if (coll.find_one()['job_id'] == item['job_id']):
+                    raise CloseSpider("Duplicate Data")
+
             item['create_time'] = job.xpath('.//span[@class="t5"]/text()').extract()
             item['company'] = job.xpath('.//span[@class="t2"]/a/text()').extract()
             # strip去除前后空格,extract的结果是list，用join结合为字符串再进行strip，避免中文乱码
             job_name = job.xpath('.//p/span/a/text()').extract()
             item['job_name'] = ''.join(job_name).strip()
+            # 添加51Job缺失的年份,在跨年份的爬取可能会出错
             day = ''.join(item['create_time'])
             day = datetime.datetime.strptime(day, '%m-%d')
             day = day.replace(datetime.date.today().year)
-            if(coll.find_one() is not None):
-                if (coll.find_one()['job_id'] == item['job_id']):
-                    raise CloseSpider("Duplicate Data")
-
             item['create_time'] = day
             item['key_word'] = response.meta['key_word']
             item['job_city'] = job.xpath('.//span[@class="t3"]/text()').extract()

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 import datetime
+import time
 
 import pymongo
 from scrapy.exceptions import DropItem
 from scrapy.conf import settings
+from scrapy.contrib.exporter import CsvItemExporter
 
 
 class jobCrawlerPipeline(object):
@@ -146,47 +148,68 @@ class jobCrawlerPipeline(object):
     def process_item(self, item, spider):
         # from scrapy.exceptions import CloseSpider
         if spider.name == 'jobCrawler':
-            # 添加51Job缺失的年份,在跨年份的爬取可能会出错
-            # day = ''.join(item['create_time'])
-            # day = datetime.datetime.strptime(day, '%m-%d')
-            # day = day.replace(datetime.date.today().year)
-            # # day = datetime.datetime.strptime(str(day), '%Y-%m-%d') 
-            # item['create_time'] = day
+            self.coll = self.db['job']
 
+            if (self.coll.find_one({"job_id": item['job_id']}) == None): 
+                job_name = item['job_name']
+                salary = item['salary']
 
-            # Get data from item
-            job_name = item['job_name']
-            salary = item['salary']
+                dirty_job_name = re.compile(r'(\*|在家|试用|体验|无需|无须|试玩|红包)+')
+                dirty_salary = re.compile(r'(小时|天)+')
 
-            dirty_job_name = re.compile(r'(\*|在家|试用|体验|无需|无须|试玩|红包)+')
-            dirty_salary = re.compile(r'(小时|天)+')
+                # clean dirty data
+                if(dirty_job_name.search(str(job_name))):
+                    raise DropItem("Dirty data %s" % item)
+                if(dirty_salary.search(str(salary))):
+                    raise DropItem("Dirty data %s" % item)
+                if(salary is None):
+                    raise DropItem("Dirty data %s" % item)
 
-            # clean dirty data
-            if(dirty_job_name.search(str(job_name))):
-                raise DropItem("Dirty data %s" % item)
-            if(dirty_salary.search(str(salary))):
-                raise DropItem("Dirty data %s" % item)
-            if(salary is None):
-                raise DropItem("Dirty data %s" % item)
+                # sort out data
 
-            # sort out data
+                salary = ''.join(salary)
 
-            salary = ''.join(salary)
+                item['salary_min'] = float(self.cut_word(salary, method='bottom'))
+                item['salary_max'] = float(self.cut_word(salary, method='top'))
+                # To Reduce Compute Time in Django, let Scrapy Pipeline compute average salary
+                item['salary_avg'] = round((item['salary_max'] + item['salary_min']) / 2, 2)
+            if spider.name == 'entrance':
+                key_word = item['key_word']
 
-            item['salary_min'] = float(self.cut_word(salary, method='bottom'))
-            item['salary_max'] = float(self.cut_word(salary, method='top'))
-            # To Reduce Compute Time in Django, let Scrapy Pipeline compute average salary
-            item['salary_avg'] = round((item['salary_max'] + item['salary_min']) / 2, 2)
-        if spider.name == 'entrance':
-            key_word = item['key_word']
+                dirty_key_word = re.compile(r'(其它)+')
 
-            dirty_key_word = re.compile(r'(其它)+')
+                if(dirty_key_word.search(str(key_word))):
+                    raise DropItem("Dirty data %s" % item)
 
-            if(dirty_key_word.search(str(key_word))):
-                raise DropItem("Dirty data %s" % item)
+            postItem = dict(item)
+            self.coll.insert(postItem)
 
-        postItem = dict(item)
-        self.coll = self.db['job']
-        self.coll.insert(postItem)
+            return item
+        else:
+            raise DropItem("Duplicate data %s" % item)
 
+class SaveToCsvPipeline(object):
+    """
+    use for export items to csv
+    file will be saved as datetime.csv (Y-M-D H-M-S) in the directory 'data'
+    """
+
+    def __init__(self):
+        now = time.strftime("%Y-%m-%d %H-%M-%S", time.localtime())
+        # 路径 + 时间.csv
+        filename = 'data/' + now + ".csv"
+        self.file = open(filename, 'wb' )
+        self.export = CsvItemExporter(self . file)
+        self.export.fields_to_export = ['job_id','job_name','company','job_city','area','salary',
+        'create_time','salary_min','salary_max','salary_avg','key_word']
+    
+    def spider_opened(self, spider):
+        self.export.start_exporting
+
+    def spider_closed(self, spider):
+        self.export.finish_exporting
+        self.file.close()
+
+    def process_item(self, item, spider):
+        self.export.export_item(item) 
         return item
