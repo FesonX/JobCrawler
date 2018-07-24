@@ -1,6 +1,7 @@
 /.idea/
 /.idea/workspace.xml
 /.idea/libraries
+/data/
 *.py[cod]
 *.so
 *.egg

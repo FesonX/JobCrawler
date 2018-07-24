@@ -1,0 +1,6 @@
+
+# crawling every Monday Wednesday Friday
+# min hour day month week command
+# * represent default, do nothing.
+# space for separate command field
+*/1 * * * * cd /home/Spider/JobCrawler && sh startup.sh
